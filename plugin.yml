@@ -1,0 +1,6 @@
+name: CustomScaffolding
+main: Artsakhskiyy\CustomScaffolding\Main
+version: 1.0.0
+api: 5.0.0
+author: Artsakhskiyy
+description: Plugin for custom scaffolding blocks with stability mechanics...
