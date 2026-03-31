@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CustomScaffolding\block;
+namespace Artsakhskiyy\CustomScaffolding\block;
 
 use pocketmine\block\BlockTypeInfo;
 use pocketmine\block\BlockIdentifier;
@@ -19,6 +19,9 @@ class ScaffoldingBlock extends Transparent {
     private int $stability = 0;
     private bool $stabilityCheck = false;
 
+    /** @var ?ScaffoldingBlock */
+    private static ?ScaffoldingBlock $instance = null;
+
     public function __construct(BlockIdentifier $id, string $name, ?BlockTypeInfo $typeInfo = null) {
         parent::__construct(
             $id,
@@ -27,8 +30,19 @@ class ScaffoldingBlock extends Transparent {
         );
     }
 
+    public static function getInstance(): ScaffoldingBlock {
+        if (self::$instance === null) {
+            self::$instance = new self(
+                new BlockIdentifier(\pocketmine\block\BlockTypeIds::newId()),
+                "Scaffolding",
+                new BlockTypeInfo(BlockBreakInfo::instant())
+            );
+        }
+        return self::$instance;
+    }
+
     protected function describeBlockOnlyState(RuntimeDataDescriber $w): void {
-        $w->int($this->stability)->withBounds(0, 7);
+        $w->boundedIntAuto(0, 7, $this->stability);
         $w->bool($this->stabilityCheck);
     }
 
