@@ -19,7 +19,6 @@ class ScaffoldingBlock extends Transparent {
     private int $stability = 0;
     private bool $stabilityCheck = false;
 
-    /** @var ?ScaffoldingBlock */
     private static ?ScaffoldingBlock $instance = null;
 
     public function __construct(BlockIdentifier $id, string $name, ?BlockTypeInfo $typeInfo = null) {
@@ -42,12 +41,12 @@ class ScaffoldingBlock extends Transparent {
     }
 
     protected function describeBlockOnlyState(RuntimeDataDescriber $w): void {
-        $w->boundedInt("stability", 0, 7, $this->stability);
+        $w->int(0, 7, $this->stability);
         $w->bool($this->stabilityCheck);
     }
 
     public function getSupportType(int $facing): SupportType {
-        return SupportType::NONE_2D;
+        return new SupportType(SupportType::TYPE_NONE);
     }
 
     public function getStability(): int {
