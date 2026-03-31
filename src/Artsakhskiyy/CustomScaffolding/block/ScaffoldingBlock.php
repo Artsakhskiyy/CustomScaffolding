@@ -47,7 +47,7 @@ class ScaffoldingBlock extends Transparent {
     }
 
     public function getSupportType(int $facing): SupportType {
-        return SupportType::NONE;
+        return SupportType::NONE_2D;
     }
 
     public function getStability(): int {
