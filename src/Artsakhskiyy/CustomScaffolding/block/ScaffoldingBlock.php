@@ -42,7 +42,7 @@ class ScaffoldingBlock extends Transparent {
     }
 
     protected function describeBlockOnlyState(RuntimeDataDescriber $w): void {
-        $w->int($this->stability)->withBounds(0, 7);
+        $w->boundedIntAuto(0, 7, $this->stability);
         $w->bool($this->stabilityCheck);
     }
 
