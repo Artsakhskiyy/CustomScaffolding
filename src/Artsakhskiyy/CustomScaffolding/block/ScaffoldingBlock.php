@@ -42,27 +42,8 @@ class ScaffoldingBlock extends Transparent {
     }
 
     protected function describeBlockOnlyState(RuntimeDataDescriber $w): void {
-        $w->boundedInt(
-            "stability",
-            0,
-            7,
-            function(): int {
-                return $this->stability;
-            },
-            function(int $v): void {
-                $this->stability = $v;
-            }
-        );
-
-        $w->bool(
-            "stability_check",
-            function(): bool {
-                return $this->stabilityCheck;
-            },
-            function(bool $v): void {
-                $this->stabilityCheck = $v;
-            }
-        );
+        $w->boundedInt("stability", 0, 7, $this->stability);
+        $w->bool($this->stabilityCheck);
     }
 
     public function getSupportType(int $facing): SupportType {
