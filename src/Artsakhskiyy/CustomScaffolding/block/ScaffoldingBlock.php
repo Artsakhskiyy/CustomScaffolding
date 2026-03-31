@@ -46,14 +46,22 @@ class ScaffoldingBlock extends Transparent {
             "stability",
             0,
             7,
-            fn(): int => $this->stability,
-            fn(int $v): void => $this->stability = $v
+            function(): int {
+                return $this->stability;
+            },
+            function(int $v): void {
+                $this->stability = $v;
+            }
         );
 
         $w->bool(
             "stability_check",
-            fn(): bool => $this->stabilityCheck,
-            fn(bool $v): void => $this->stabilityCheck = $v
+            function(): bool {
+                return $this->stabilityCheck;
+            },
+            function(bool $v): void {
+                $this->stabilityCheck = $v;
+            }
         );
     }
 
