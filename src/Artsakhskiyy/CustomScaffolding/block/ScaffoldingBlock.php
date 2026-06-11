@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(declare_types=1);
 
 namespace Artsakhskiyy\CustomScaffolding\block;
 
@@ -8,7 +8,7 @@ use pocketmine\block\BlockTypeInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\Transparent;
 use pocketmine\block\BlockBreakInfo;
-use pocketmine\block\utils\SupportType;
+use pocketmine\block\SupportType;
 use pocketmine\data\runtime\RuntimeDataDescriber;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
