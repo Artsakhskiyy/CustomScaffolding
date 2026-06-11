@@ -1,6 +1,6 @@
 <?php
 
-declare(declare_types=1);
+declare(strict_types=1);
 
 namespace Artsakhskiyy\CustomScaffolding\block;
 
@@ -8,7 +8,7 @@ use pocketmine\block\BlockTypeInfo;
 use pocketmine\block\BlockIdentifier;
 use pocketmine\block\Transparent;
 use pocketmine\block\BlockBreakInfo;
-use pocketmine\block\SupportType;
+use pocketmine\block\utils\SupportType;
 use pocketmine\data\runtime\RuntimeDataDescriber;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
@@ -46,7 +46,8 @@ class ScaffoldingBlock extends Transparent {
     }
 
     public function getSupportType(int $facing): SupportType {
-        return SupportType::NONE;
+        $fallback = constant(SupportType::class . "::NONE") ?? constant(SupportType::class . "::TYPE_NONE");
+        return $fallback;
     }
 
     public function getStability(): int {
