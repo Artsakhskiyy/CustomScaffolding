@@ -41,13 +41,12 @@ class ScaffoldingBlock extends Transparent {
     }
 
     protected function describeBlockOnlyState(RuntimeDataDescriber $w): void {
-        // Выделяем ровно 3 бита под стабильность (числа 0-7) и 1 бит под bool
         $w->int(3, $this->stability);
         $w->bool($this->stabilityCheck);
     }
 
     public function getSupportType(int $facing): SupportType {
-        return new SupportType(SupportType::TYPE_NONE);
+        return SupportType::NONE;
     }
 
     public function getStability(): int {
