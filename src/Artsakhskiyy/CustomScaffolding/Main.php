@@ -34,7 +34,6 @@ class Main extends PluginBase {
                     $block = ScaffoldingBlock::getInstance();
                     RuntimeBlockStateRegistry::getInstance()->register($block);
 
-                    // Десериализатор для асинхронных потоков
                     GlobalBlockStateHandlers::getDeserializer()->map(BlockTypeNames::SCAFFOLDING, function(BlockStateReader $data) use ($block): ScaffoldingBlock {
                         $b = clone $block;
                         $b->setStability($data->readInt("stability"));
@@ -42,7 +41,6 @@ class Main extends PluginBase {
                         return $b;
                     });
 
-                    // Сериализатор для асинхронных потоков
                     GlobalBlockStateHandlers::getSerializer()->map($block, function(ScaffoldingBlock $block): BlockStateWriter {
                         return BlockStateWriter::create(BlockTypeNames::SCAFFOLDING)
                             ->writeInt("stability", $block->getStability())
@@ -60,7 +58,6 @@ class Main extends PluginBase {
 
         RuntimeBlockStateRegistry::getInstance()->register($block);
 
-        // Десериализатор для основного потока
         GlobalBlockStateHandlers::getDeserializer()->map(BlockTypeNames::SCAFFOLDING, function(BlockStateReader $data) use ($block): ScaffoldingBlock {
             $b = clone $block;
             $b->setStability($data->readInt("stability"));
@@ -68,7 +65,6 @@ class Main extends PluginBase {
             return $b;
         });
 
-        // Сериализатор для основного потока
         GlobalBlockStateHandlers::getSerializer()->map($block, function(ScaffoldingBlock $block): BlockStateWriter {
             return BlockStateWriter::create(BlockTypeNames::SCAFFOLDING)
                 ->writeInt("stability", $block->getStability())
