@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Artsakhskiyy\CustomScaffolding;
 
 use pocketmine\block\RuntimeBlockStateRegistry;
-use pocketmine\data\bedrock\block\BlockStateNames;
+use pocketmine\data\bedrock\block\BlockStateData;
 use pocketmine\data\bedrock\block\BlockTypeNames;
-use pocketmine\data\bedrock\item\SavedItemData;
 use pocketmine\data\bedrock\block\convert\BlockStateReader;
 use pocketmine\data\bedrock\block\convert\BlockStateWriter;
+use pocketmine\data\bedrock\item\SavedItemData;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\item\StringToItemParser;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\AsyncTask;
 use pocketmine\world\format\io\GlobalBlockStateHandlers;
 use pocketmine\world\format\io\GlobalItemDataHandlers;
 use Artsakhskiyy\CustomScaffolding\block\ScaffoldingBlock;
@@ -24,25 +25,55 @@ class Main extends PluginBase {
     }
 
     private function registerScaffolding(): void {
+        $this->registerOnCurrentThread();
 
+        $pool = $this->getServer()->getAsyncPool();
+        $pool->addWorkerStartHook(function(int $worker) use ($pool): void {
+            $pool->submitTaskToWorker(new class extends AsyncTask {
+                public function onRun(): void {
+                    $block = ScaffoldingBlock::getInstance();
+                    RuntimeBlockStateRegistry::getInstance()->register($block);
+
+                    // Десериализатор для асинхронных потоков
+                    GlobalBlockStateHandlers::getDeserializer()->map(BlockTypeNames::SCAFFOLDING, function(BlockStateReader $data) use ($block): ScaffoldingBlock {
+                        $b = clone $block;
+                        $b->setStability($data->readInt("stability"));
+                        $b->setStabilityCheck($data->readBool("stability_check"));
+                        return $b;
+                    });
+
+                    // Сериализатор для асинхронных потоков
+                    GlobalBlockStateHandlers::getSerializer()->map($block, function(ScaffoldingBlock $block): BlockStateWriter {
+                        return BlockStateWriter::create(BlockTypeNames::SCAFFOLDING)
+                            ->writeInt("stability", $block->getStability())
+                            ->writeBool("stability_check", $block->isStabilityCheck());
+                    });
+                }
+            }, $worker);
+        });
+
+        CreativeInventory::getInstance()->add(clone ScaffoldingBlock::getInstance()->asItem());
+    }
+
+    private function registerOnCurrentThread(): void {
         $block = ScaffoldingBlock::getInstance();
 
-        $serializer = GlobalBlockStateHandlers::getSerializer();
-        $deserializer = GlobalBlockStateHandlers::getDeserializer();
-
-        $deserializer->map(BlockTypeNames::SCAFFOLDING, function(BlockStateReader $reader) use ($block): ScaffoldingBlock {
-            return (clone $block)
-                ->setStability($reader->readBoundedInt(BlockStateNames::STABILITY, 0, 7))
-                ->setStabilityCheck($reader->readBool(BlockStateNames::STABILITY_CHECK));
-        });
-
-        $serializer->map($block, function(ScaffoldingBlock $block): BlockStateWriter {
-            return BlockStateWriter::create(BlockTypeNames::SCAFFOLDING)
-                ->writeInt(BlockStateNames::STABILITY, $block->getStability())
-                ->writeBool(BlockStateNames::STABILITY_CHECK, $block->isStabilityCheck());
-        });
-
         RuntimeBlockStateRegistry::getInstance()->register($block);
+
+        // Десериализатор для основного потока
+        GlobalBlockStateHandlers::getDeserializer()->map(BlockTypeNames::SCAFFOLDING, function(BlockStateReader $data) use ($block): ScaffoldingBlock {
+            $b = clone $block;
+            $b->setStability($data->readInt("stability"));
+            $b->setStabilityCheck($data->readBool("stability_check"));
+            return $b;
+        });
+
+        // Сериализатор для основного потока
+        GlobalBlockStateHandlers::getSerializer()->map($block, function(ScaffoldingBlock $block): BlockStateWriter {
+            return BlockStateWriter::create(BlockTypeNames::SCAFFOLDING)
+                ->writeInt("stability", $block->getStability())
+                ->writeBool("stability_check", $block->isStabilityCheck());
+        });
 
         GlobalItemDataHandlers::getDeserializer()->map(
             BlockTypeNames::SCAFFOLDING,
@@ -55,6 +86,5 @@ class Main extends PluginBase {
         );
 
         StringToItemParser::getInstance()->register("scaffolding", fn() => clone $block->asItem());
-        CreativeInventory::getInstance()->add(clone $block->asItem());
     }
 }
