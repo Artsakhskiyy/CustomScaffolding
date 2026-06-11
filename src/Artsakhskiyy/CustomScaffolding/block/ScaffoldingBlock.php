@@ -16,8 +16,8 @@ use pocketmine\player\Player;
 
 class ScaffoldingBlock extends Transparent {
 
-    private int $stability = 0;
-    private bool $stabilityCheck = false;
+    protected int $stability = 0;
+    protected bool $stabilityCheck = false;
 
     private static ?ScaffoldingBlock $instance = null;
 
@@ -32,7 +32,7 @@ class ScaffoldingBlock extends Transparent {
     public static function getInstance(): ScaffoldingBlock {
         if (self::$instance === null) {
             self::$instance = new self(
-                new BlockIdentifier(\pocketmine\block\BlockTypeIds::newId()),
+                new BlockIdentifier(25002),
                 "Scaffolding",
                 new BlockTypeInfo(BlockBreakInfo::instant())
             );
@@ -41,7 +41,8 @@ class ScaffoldingBlock extends Transparent {
     }
 
     protected function describeBlockOnlyState(RuntimeDataDescriber $w): void {
-        $w->int(0, 7, $this->stability);
+        // Выделяем ровно 3 бита под стабильность (числа 0-7) и 1 бит под bool
+        $w->int(3, $this->stability);
         $w->bool($this->stabilityCheck);
     }
 
@@ -55,7 +56,7 @@ class ScaffoldingBlock extends Transparent {
 
     public function setStability(int $value): self {
         if ($value < 0 || $value > 7) {
-            throw new \InvalidArgumentException("Stability must be 0-7, got {$value}");
+            throw new \InvalidArgumentException("Stability must be in range 0-7, got {$value}");
         }
         $this->stability = $value;
         return $this;
